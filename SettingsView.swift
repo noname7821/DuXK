@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var notifs: NotificationManager
+    @EnvironmentObject var remote: RemoteConfig
     @AppStorage("duxk.notifs") var notifsOn = true
 
     var body: some View {
@@ -32,7 +33,7 @@ struct SettingsView: View {
                 Section(header: Text("Credits")) {
                     Link(destination: URL(string: "https://www.tiktok.com/@duxk40?is_from_webapp=1&sender_device=pc")!) {
                         HStack(spacing: 12) {
-                            TikTokIcon(size: 48)
+                            DuckAvatar(size: 48, cornerRadius: 24)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("duxk40")
                                     .font(.headline)
@@ -65,10 +66,24 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("App")) {
+                    if remote.updateAvailable {
+                        Button(action: { remote.openReleases() }) {
+                            HStack {
+                                Label("Update available", systemImage: "arrow.down.circle.fill")
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text(remote.latestVersion)
+                                    .foregroundColor(.secondary)
+                                Image(systemName: "arrow.up.right")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0.0")
+                        Text(remote.appVersion)
                             .foregroundColor(.secondary)
                     }
                     HStack {

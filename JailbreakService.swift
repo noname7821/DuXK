@@ -20,7 +20,11 @@ class JailbreakService: ObservableObject {
         ("PPPwn (TheOfficialFloW)", "https://github.com/TheOfficialFloW/PPPwn"),
         ("PS5 UMTX Jailbreak (PS5Dev)", "https://github.com/PS5Dev/PS5-UMTX-Jailbreak"),
         ("etaHEN Releases", "https://github.com/etaHEN/etaHEN/releases"),
+        ("GoldHEN (PS4 HEN)", "https://github.com/GoldHEN/GoldHEN"),
         ("ConsoleMods PS4 Exploit Chart", "https://consolemods.org/wiki/PS4:Exploit_Chart"),
+        ("r/ps4homebrew", "https://www.reddit.com/r/ps4homebrew/"),
+        ("r/PS5_Jailbreak", "https://www.reddit.com/r/PS5_Jailbreak/"),
+        ("PlayStation Blog", "https://blog.playstation.com/"),
         ("PlayStation System Updates PS4", "https://www.playstation.com/en-us/support/hardware/ps4/system-software/"),
         ("PlayStation System Updates PS5", "https://www.playstation.com/en-us/support/hardware/ps5/system-software/")
     ]

@@ -1,32 +1,26 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @AppStorage("duxk.accepted") var accepted = false
-    @AppStorage("duxk.declined") var declined = false
     @State private var showWelcome = false
 
     var body: some View {
         Group {
-            if declined && !accepted {
-                BlockedView(onRetry: {
-                    declined = false
-                    showWelcome = true
-                })
-            } else if !accepted {
+            if !accepted {
                 HomePlaceholder()
                     .onAppear { showWelcome = true }
                     .fullScreenCover(isPresented: $showWelcome) {
                         WelcomeView(
                             onAccept: {
                                 accepted = true
-                                declined = false
                                 showWelcome = false
                                 NotificationManager.shared.requestPermission()
                                 JailbreakService.shared.refresh()
                             },
                             onDecline: {
-                                declined = true
-                                showWelcome = false
+                                // Decline = App sofort beenden, kein Lock-Screen.
+                                exit(0)
                             }
                         )
                     }
@@ -40,6 +34,7 @@ struct ContentView: View {
 struct MainTabs: View {
     @StateObject private var service = JailbreakService.shared
     @StateObject private var notifs = NotificationManager.shared
+    @StateObject private var remote = RemoteConfig.shared
 
     var body: some View {
         TabView {
@@ -64,42 +59,57 @@ struct MainTabs: View {
         .accentColor(Color.blue)
         .environmentObject(service)
         .environmentObject(notifs)
+        .environmentObject(remote)
+        .onAppear { remote.check() }
+        .alert(isPresented: $remote.updateAvailable) {
+            Alert(
+                title: Text("New update available"),
+                message: Text("Version \(remote.latestVersion) ist da (du hast \(remote.appVersion))."),
+                primaryButton: .default(Text("Update")) { remote.openReleases() },
+                secondaryButton: .cancel(Text("Später")) { remote.snooze() }
+            )
+        }
+        .fullScreenCover(isPresented: $remote.shutdownActive) {
+            ShutdownView()
+        }
+    }
+}
+
+struct ShutdownView: View {
+    @State private var seconds = 5
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            Text("DuXK wurde abgeschaltet")
+                .font(.title2).bold()
+            Text("Der Entwickler hat diese App eingestellt. Sie wird in \(seconds)s beendet.")
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { t in
+                if seconds > 0 {
+                    seconds -= 1
+                } else {
+                    t.invalidate()
+                    exit(0)
+                }
+            }
+        }
     }
 }
 
 struct HomePlaceholder: View {
     var body: some View {
         VStack(spacing: 12) {
-            Image(systemName: "tortoise.fill")
-                .font(.largeTitle)
-                .foregroundColor(.blue)
+            DuckAvatar(size: 60, cornerRadius: 15)
             Text("DuXK")
                 .font(.title).bold()
         }
-    }
-}
-
-struct BlockedView: View {
-    var onRetry: () -> Void
-    var body: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            Text("🦆")
-                .font(.system(size: 60))
-            Text("App Locked")
-                .font(.title2).bold()
-            Text("You need to accept the Terms to use DuXK.")
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
-            Button("Review Terms Again", action: onRetry)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
-            Spacer()
-        }
-        .padding()
     }
 }

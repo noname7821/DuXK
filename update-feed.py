@@ -65,6 +65,26 @@ def main():
             e["isNew"] = True
             changed.append(f"etaHEN {tag}")
 
+    goldhen = gh_latest("GoldHEN/GoldHEN")
+    if goldhen:
+        tag = goldhen.get("tag_name", "")
+        date = iso(goldhen.get("published_at", ""))
+        e = by_id.get("ps4-goldhen")
+        if e is None:
+            e = {"id": "ps4-goldhen", "title": "", "body": "", "date": date,
+                 "type": "Jailbreak", "console": "PS4", "firmware": "9.00",
+                 "url": "https://github.com/GoldHEN/GoldHEN/releases", "isNew": True}
+            feed["news"].append(e)
+            by_id["ps4-goldhen"] = e
+        if tag and tag not in e.get("title", ""):
+            e["title"] = f"GoldHEN {tag} fuer PS4"
+            e["body"] = (f"GoldHEN {tag} vom {date[:10]}: Homebrew Enabler nach Jailbreak "
+                         "starten (5.05/6.72/9.00/11.00+, je nach Kette). Details im Release.")
+            e["date"] = date
+            e["url"] = goldhen.get("html_url", e["url"])
+            e["isNew"] = True
+            changed.append(f"GoldHEN {tag}")
+
     pppwn = None
     try:
         req = urllib.request.Request(

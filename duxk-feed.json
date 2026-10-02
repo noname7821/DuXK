@@ -65,6 +65,17 @@
       "firmware": "11.00",
       "url": "https://github.com/TheOfficialFloW/PPPwn",
       "isNew": false
+    },
+    {
+      "id": "ps4-goldhen",
+      "title": "GoldHEN 2.3 fuer PS4",
+      "body": "GoldHEN 2.3 vom 2022-12-24: Homebrew Enabler nach Jailbreak starten (5.05/6.72/9.00/11.00+, je nach Kette). Details im Release.",
+      "date": "2022-12-24T23:48:04Z",
+      "type": "Jailbreak",
+      "console": "PS4",
+      "firmware": "9.00",
+      "url": "https://github.com/GoldHEN/GoldHEN/releases/tag/2.3",
+      "isNew": true
     }
   ],
   "firmwares": [

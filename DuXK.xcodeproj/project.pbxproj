@@ -43,6 +43,8 @@
 				A1B2C3D400020001A2B3C1B1,
 				A1B2C3D400020001A2B3C1C1,
 				A1B2C3D400020001A2B3C1D1,
+				A1B2C3D400020001A2B3C1E1,
+				A1B2C3D400020001A2B3C1F1,
 				A1B2C3D400010001A2B3C003,
 			);
 			sourceTree = "<group>";
@@ -87,6 +89,7 @@
 				A1B2C3D400020001A2B3C182,
 				A1B2C3D400020001A2B3C192,
 				A1B2C3D400020001A2B3C1D2,
+				A1B2C3D400020001A2B3C1E2,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +106,7 @@
 			files = (
 				A1B2C3D400020001A2B3C1A2,
 				A1B2C3D400020001A2B3C1B2,
+				A1B2C3D400020001A2B3C1F2,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,7 +195,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.duxk.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -218,7 +222,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.duxk.app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -373,6 +377,26 @@
 		A1B2C3D400020001A2B3C1D2 = {
 			isa = PBXBuildFile;
 			fileRef = A1B2C3D400020001A2B3C1D1;
+		};
+		A1B2C3D400020001A2B3C1E1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = RemoteConfig.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C1E2 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C1E1;
+		};
+		A1B2C3D400020001A2B3C1F1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.jpeg;
+			path = duck.jpg;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C1F2 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C1F1;
 		};
 	};
 	rootObject = A1B2C3D400010001A2B3C001;
