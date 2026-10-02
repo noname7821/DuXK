@@ -10,11 +10,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     HStack(spacing: 14) {
-                        Image("duck")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 56, height: 56)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                        DuckAvatar(size: 56)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("All set")
                                 .font(.headline)

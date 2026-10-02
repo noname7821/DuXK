@@ -8,11 +8,7 @@ struct WelcomeView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
-                    Image("duck")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 110, height: 110)
-                        .clipShape(RoundedRectangle(cornerRadius: 26))
+                    DuckAvatar(size: 110, cornerRadius: 26)
                         .shadow(radius: 8)
                         .padding(.top, 32)
 

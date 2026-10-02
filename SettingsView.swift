@@ -32,11 +32,7 @@ struct SettingsView: View {
                 Section(header: Text("Credits")) {
                     Link(destination: URL(string: "https://www.tiktok.com/@duxk40?is_from_webapp=1&sender_device=pc")!) {
                         HStack(spacing: 12) {
-                            Image("duck")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 48, height: 48)
-                                .clipShape(Circle())
+                            TikTokIcon(size: 48)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("duxk40")
                                     .font(.headline)

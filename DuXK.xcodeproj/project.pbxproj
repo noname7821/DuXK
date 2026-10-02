@@ -42,6 +42,7 @@
 				A1B2C3D400020001A2B3C1A1,
 				A1B2C3D400020001A2B3C1B1,
 				A1B2C3D400020001A2B3C1C1,
+				A1B2C3D400020001A2B3C1D1,
 				A1B2C3D400010001A2B3C003,
 			);
 			sourceTree = "<group>";
@@ -85,6 +86,7 @@
 				A1B2C3D400020001A2B3C172,
 				A1B2C3D400020001A2B3C182,
 				A1B2C3D400020001A2B3C192,
+				A1B2C3D400020001A2B3C1D2,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,6 +363,16 @@
 			lastKnownFileType = text.plist.xml;
 			path = Info.plist;
 			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C1D1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = AppIcons.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C1D2 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C1D1;
 		};
 	};
 	rootObject = A1B2C3D400010001A2B3C001;
