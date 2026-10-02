@@ -44,7 +44,7 @@ jobs:
 
       - name: Archive
         run: |
-          xcodebuild -project DuXK.xcodeproj -target DuXK -configuration Release -destination 'generic/platform=iOS' -archivePath build/DuXK.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES
+          xcodebuild -project DuXK.xcodeproj -scheme DuXK -configuration Release -destination 'generic/platform=iOS' -archivePath build/DuXK.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES
 
       - name: Pack IPA
         run: |
