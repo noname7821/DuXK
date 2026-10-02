@@ -9,9 +9,9 @@ import UIKit
 class RemoteConfig: ObservableObject {
     static let shared = RemoteConfig()
 
-    private let versionURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/version.txt")!
-    private let shutdownURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/shutdown.txt")!
-    private let discordURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/discord.txt")!
+    private let versionURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/refs/heads/main/version.txt")!
+    private let shutdownURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/refs/heads/main/shutdown.txt")!
+    private let discordURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/refs/heads/main/discord.txt")!
     static let releasesURL = URL(string: "https://github.com/noname7821/DuXK/releases")!
     static let termsURL = URL(string: "https://github.com/noname7821/DuXK/blob/main/TERMS.md")!
 
@@ -79,7 +79,10 @@ class RemoteConfig: ObservableObject {
     }
 
     private func fetchText(_ url: URL, completion: @escaping (String?) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, _ in
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 10
+        config.timeoutIntervalForResource = 15
+        URLSession(configuration: config).dataTask(with: url) { data, _, _ in
             guard let data = data, let s = String(data: data, encoding: .utf8) else {
                 completion(nil)
                 return

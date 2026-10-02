@@ -77,7 +77,6 @@ struct MainTabs: View {
 
 struct ShutdownView: View {
     @EnvironmentObject var remote: RemoteConfig
-    @State private var seconds = 5
 
     var body: some View {
         VStack(spacing: 12) {
@@ -88,6 +87,7 @@ struct ShutdownView: View {
                 .font(.system(size: 28, weight: .bold))
             Text("Sorry, DuXK got shut down.")
                 .font(.headline)
+                .multilineTextAlignment(.center)
             if remote.hasValidDiscord, let url = URL(string: remote.discordInvite) {
                 Link(destination: url) {
                     Text("Any other infos can you find in our Discord Server.")
@@ -104,23 +104,10 @@ struct ShutdownView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
             }
-            Text("Closing in \(seconds)s…")
-                .font(.caption)
-                .foregroundColor(.secondary)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { t in
-                if seconds > 0 {
-                    seconds -= 1
-                } else {
-                    t.invalidate()
-                    exit(0)
-                }
-            }
-        }
     }
 }
 

@@ -9,7 +9,9 @@ class JailbreakService: ObservableObject {
     @Published var isLoading = false
     @Published var lastUpdated: Date?
 
-    private let remoteURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/duxk-feed.json")!
+    private let remoteURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/refs/heads/main/duxk-feed.json")!
+    private let etahenURL = URL(string: "https://api.github.com/repos/etaHEN/etaHEN/releases/latest")!
+    private let goldhenURL = URL(string: "https://api.github.com/repos/GoldHEN/GoldHEN/releases/latest")!
 
     let sources: [(name: String, url: String)] = [
         ("Wololo.net", "https://wololo.net"),
@@ -21,6 +23,9 @@ class JailbreakService: ObservableObject {
         ("PS5 UMTX Jailbreak (PS5Dev)", "https://github.com/PS5Dev/PS5-UMTX-Jailbreak"),
         ("etaHEN Releases", "https://github.com/etaHEN/etaHEN/releases"),
         ("GoldHEN (PS4 HEN)", "https://github.com/GoldHEN/GoldHEN"),
+        ("GoldHEN Plugins", "https://github.com/GoldHEN/GoldHEN_Plugins_Repository"),
+        ("ItemzFlow (PS5)", "https://github.com/LightningMods/ItemzFlow"),
+        ("Modded Warfare (YouTube)", "https://www.youtube.com/@ModdedWarfare"),
         ("ConsoleMods PS4 Exploit Chart", "https://consolemods.org/wiki/PS4:Exploit_Chart"),
         ("r/ps4homebrew", "https://www.reddit.com/r/ps4homebrew/"),
         ("r/PS5_Jailbreak", "https://www.reddit.com/r/PS5_Jailbreak/"),
@@ -71,22 +76,76 @@ class JailbreakService: ObservableObject {
     private func refreshForced(_ force: Bool, completion: ((Bool) -> Void)? = nil) {
         if isLoading { completion?(false); return }
         isLoading = true
+        let group = DispatchGroup()
+        var feedOK = false
+
+        group.enter()
         let task = URLSession.shared.dataTask(with: remoteURL) { data, _, _ in
+            defer { group.leave() }
             DispatchQueue.main.async {
-                self.isLoading = false
                 guard let data = data,
                       let feed = try? JSONDecoder().decode(Feed.self, from: data) else {
-                    completion?(false)
                     return
                 }
                 self.applyNewFeed(feed)
                 self.saveCache(data)
                 UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: self.lastRefreshKey)
-                completion?(true)
+                feedOK = true
             }
         }
         task.resume()
+
+        // Automatisch: neueste etaHEN- + GoldHEN-Releases direkt von GitHub,
+        // kein manuelles JSON-Edit noetig.
+        group.enter()
+        fetchLatestRelease(etahenURL, id: "ps5-ethen-latest", console: .ps5, firmware: "7.61-10.01", type: .jailbreak) { _ in group.leave() }
+        group.enter()
+        fetchLatestRelease(goldhenURL, id: "ps4-goldhen-latest", console: .ps4, firmware: "5.05+", type: .jailbreak) { _ in group.leave() }
+
+        group.notify(queue: .main) {
+            self.isLoading = false
+            completion?(feedOK)
+        }
         _ = force
+    }
+
+    /// Holt das neueste Release eines Repos und mischt es als News ein.
+    private func fetchLatestRelease(_ url: URL, id: String, console: ConsoleType, firmware: String, type: NewsType, completion: @escaping (Bool) -> Void) {
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let tag = json["tag_name"] as? String,
+                  let date = json["published_at"] as? String,
+                  let html = json["html_url"] as? String else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+            let title = "\(tag) released"
+            let body = (json["body"] as? String ?? "").prefix(220).trimmingCharacters(in: .whitespacesAndNewlines)
+            DispatchQueue.main.async {
+                var changed = false
+                var items = self.news
+                if let i = items.firstIndex(where: { $0.id == id }) {
+                    if items[i].title != title {
+                        items[i].title = title
+                        items[i].body = body.isEmpty ? items[i].body : String(body)
+                        items[i].date = date
+                        items[i].url = html
+                        items[i].isNew = true
+                        changed = true
+                    }
+                } else {
+                    items.append(NewsItem(id: id, title: title, body: body.isEmpty ? "New release on GitHub." : String(body), date: date, type: type, console: console, firmware: firmware, url: html, isNew: true))
+                    changed = true
+                }
+                self.news = items.sorted { $0.dateValue > $1.dateValue }
+                if changed {
+                    let ids = self.news.map { $0.id }
+                    UserDefaults.standard.set(ids, forKey: self.seenKey)
+                }
+                completion(changed)
+            }
+        }.resume()
     }
 
     func startAutoRefresh() {

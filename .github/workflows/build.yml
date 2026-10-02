@@ -23,6 +23,8 @@ jobs:
           test -f SettingsView.swift
           test -f fallbackNews.json
           test -f duxk-feed.json
+          test -d Assets.xcassets
+          test -f Assets.xcassets/duck.imageset/duck.jpg
 
       - name: Validate JSON
         run: |

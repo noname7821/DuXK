@@ -44,7 +44,7 @@
 				A1B2C3D400020001A2B3C1C1,
 				A1B2C3D400020001A2B3C1D1,
 				A1B2C3D400020001A2B3C1E1,
-				A1B2C3D400020001A2B3C1F1,
+				A1B2C3D400020001A2B3C201,
 				A1B2C3D400010001A2B3C003,
 			);
 			sourceTree = "<group>";
@@ -106,7 +106,7 @@
 			files = (
 				A1B2C3D400020001A2B3C1A2,
 				A1B2C3D400020001A2B3C1B2,
-				A1B2C3D400020001A2B3C1F2,
+				A1B2C3D400020001A2B3C202,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,15 +388,15 @@
 			isa = PBXBuildFile;
 			fileRef = A1B2C3D400020001A2B3C1E1;
 		};
-		A1B2C3D400020001A2B3C1F1 = {
+		A1B2C3D400020001A2B3C201 = {
 			isa = PBXFileReference;
-			lastKnownFileType = image.jpeg;
-			path = duck.jpg;
+			lastKnownFileType = folder.assetcatalog;
+			path = Assets.xcassets;
 			sourceTree = "<group>";
 		};
-		A1B2C3D400020001A2B3C1F2 = {
+		A1B2C3D400020001A2B3C202 = {
 			isa = PBXBuildFile;
-			fileRef = A1B2C3D400020001A2B3C1F1;
+			fileRef = A1B2C3D400020001A2B3C201;
 		};
 	};
 	rootObject = A1B2C3D400010001A2B3C001;

@@ -41,5 +41,9 @@ We may update these terms in this file. Continued use means you accept them.
 ## 10. Contact
 Questions? Join our Discord server (invite in `discord.txt`).
 
+## 10. Official Source
+Only https://github.com/noname7821/DuXK is real! We are not responsible
+if you download a fake copy and get a virus.
+
 ---
 See [LICENSE](LICENSE). App version: see [version.txt](version.txt).
