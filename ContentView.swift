@@ -70,23 +70,43 @@ struct MainTabs: View {
             )
         }
         .fullScreenCover(isPresented: $remote.shutdownActive) {
-            ShutdownView()
+            ShutdownView(discordInvite: remote.discordInvite)
         }
     }
 }
 
 struct ShutdownView: View {
+    var discordInvite: String = ""
     @State private var seconds = 5
 
     var body: some View {
         VStack(spacing: 12) {
             Spacer()
-            Text("DuXK wurde abgeschaltet")
-                .font(.title2).bold()
-            Text("Der Entwickler hat diese App eingestellt. Sie wird in \(seconds)s beendet.")
-                .multilineTextAlignment(.center)
+            DuckAvatar(size: 110, cornerRadius: 26)
+                .shadow(radius: 8)
+            Text("DuXK")
+                .font(.title).bold()
+            Text("Sorry, DuXK got shut down.")
+                .font(.headline)
+            if let url = URL(string: discordInvite), discordInvite.hasPrefix("https://") {
+                Link(destination: url) {
+                    Text("Any other infos can you find in our Discord Server.")
+                        .font(.body)
+                        .foregroundColor(.blue)
+                        .underline()
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+            } else {
+                Text("Any other infos can you find in our Discord Server.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            Text("Closing in \(seconds)s…")
+                .font(.caption)
                 .foregroundColor(.secondary)
-                .padding(.horizontal)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

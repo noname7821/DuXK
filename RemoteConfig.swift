@@ -11,11 +11,14 @@ class RemoteConfig: ObservableObject {
 
     private let versionURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/version.txt")!
     private let shutdownURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/shutdown.txt")!
+    private let discordURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/discord.txt")!
     static let releasesURL = URL(string: "https://github.com/noname7821/DuXK/releases")!
+    static let termsURL = URL(string: "https://github.com/noname7821/DuXK/blob/main/TERMS.md")!
 
     @Published var updateAvailable = false
     @Published var latestVersion = ""
     @Published var shutdownActive = false
+    @Published var discordInvite = ""
 
     var appVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.1"
@@ -43,6 +46,16 @@ class RemoteConfig: ObservableObject {
                 DispatchQueue.main.async { self?.shutdownActive = true }
             }
         }
+        fetchText(discordURL) { [weak self] remote in
+            guard let remote = remote else { return }
+            let invite = remote.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard invite.hasPrefix("https://") else { return }
+            DispatchQueue.main.async { self?.discordInvite = invite }
+        }
+    }
+
+    var hasValidDiscord: Bool {
+        discordInvite.hasPrefix("https://")
     }
 
     func snooze() {

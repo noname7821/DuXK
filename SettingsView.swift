@@ -50,6 +50,42 @@ struct SettingsView: View {
                     }
                 }
 
+                Section(header: Text("Community")) {
+                    if remote.hasValidDiscord, let url = URL(string: remote.discordInvite) {
+                        Link(destination: url) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "bubble.left.and.bubble.right.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.white)
+                                    .frame(width: 48, height: 48)
+                                    .background(Color(red: 0.35, green: 0.4, blue: 0.95))
+                                    .cornerRadius(14)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Join our Discord server")
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    Text("Support, updates and news")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } else {
+                        HStack {
+                            Label("Join our Discord server", systemImage: "bubble.left.and.bubble.right.fill")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text("Invite coming soon")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+
                 Section(header: Text("Sources"), footer: Text("DuXK checks these sites for new jailbreak and firmware info.")) {
                     ForEach(JailbreakService.shared.sources, id: \.name) { s in
                         Link(destination: URL(string: s.url)!) {

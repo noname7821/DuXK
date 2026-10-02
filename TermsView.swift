@@ -4,17 +4,28 @@ struct TermsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Terms of Use")
-                    .font(.title2).bold()
+                HStack(spacing: 12) {
+                    DuckAvatar(size: 48, cornerRadius: 12)
+                    Text("Terms of Use")
+                        .font(.title2).bold()
+                }
 
                 Group {
-                    Text("1. Info Only").bold() + Text("\nDuXK only shares public news about PS4 and PS5 jailbreaks, system updates and patches. We do not host exploits.")
-                    Text("2. Your Responsibility").bold() + Text("\nModifying your console can void warranty, cause bans, data loss or bricks. You act at your own risk.")
-                    Text("3. No Liability").bold() + Text("\nDuXK and its team are not responsible for any damage, ban or loss caused by following linked info.")
-                    Text("4. Stay Safe").bold() + Text("\nAlways check multiple trusted sources, stay on low firmware if you want homebrew, and turn off auto-updates.")
-                    Text("5. External Links").bold() + Text("\nAll links belong to their owners (Wololo, PSXHAX, PlayStation, GitHub devs). Their terms apply.")
+                    Text("1. Info Only").bold() + Text("\nDuXK only shares public news about PS4 and PS5 jailbreaks, system updates and patches. We do not host, develop or distribute exploits, payloads or copyrighted files.")
+                    Text("2. Your Responsibility").bold() + Text("\nModifying your console can void warranty, cause PSN bans, data loss or bricks. Everything you do with your console is your own decision and your own risk.")
+                    Text("3. No Liability").bold() + Text("\nDuXK and its team are not responsible for any damage, ban, data loss or cost caused by following linked info. No warranty, as-is.")
+                    Text("4. External Links").bold() + Text("\nAll links belong to their owners (Wololo, PSXHAX, PSX-Place, GBATemp, PlayStation, GitHub developers). Their terms apply when you open them.")
+                    Text("5. No Affiliation").bold() + Text("\nDuXK is not affiliated with or endorsed by Sony Interactive Entertainment.")
+                    Text("6. Stay Safe").bold() + Text("\nAlways check multiple trusted sources, stay on low firmware if you want homebrew, and turn off auto-updates. We give no guarantee that any method still works on your firmware.")
+                    Text("7. Minors").bold() + Text("\nIf you are under the age required in your country, only use DuXK with a parent or guardian.")
+                    Text("8. No Misuse").bold() + Text("\nDo not use information from DuXK for illegal activity. Respect copyright.")
+                    Text("9. Changes").bold() + Text("\nWe may update these terms on GitHub (TERMS.md). Continued use means you accept them.")
                 }
                 .font(.body)
+
+                Link("Full Terms + License on GitHub →", destination: RemoteConfig.termsURL)
+                    .font(.headline)
+                    .padding(.top, 4)
 
                 Text("By tapping Accept you confirm you read this and use DuXK at your own risk.")
                     .font(.caption)
