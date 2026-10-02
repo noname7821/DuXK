@@ -15,7 +15,7 @@ struct WelcomeView: View {
                         .padding(.top, 32)
 
                     Text("Welcome to DuXK")
-                        .font(.title).bold()
+                        .font(.title).fontWeight(.bold)
 
                     Text("Thanks for using DuXK.")
                         .font(.headline)
@@ -23,7 +23,7 @@ struct WelcomeView: View {
 
                     VStack(spacing: 10) {
                         Text("I'm a Duck, quack quack!")
-                            .font(.body).bold()
+                            .font(.body).fontWeight(.bold)
                         Text("I will notify you when a new PS4 or PS5 jailbreak is released, is in progress, or when a system update patches something important.")
                             .font(.body)
                             .multilineTextAlignment(.center)
@@ -59,7 +59,7 @@ struct WelcomeView: View {
                         }
                         .font(.subheadline)
                         Link("Full Terms on GitHub →", destination: RemoteConfig.termsURL)
-                            .font(.subheadline).bold()
+                            .font(.subheadline).fontWeight(.bold)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()

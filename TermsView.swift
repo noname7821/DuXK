@@ -7,7 +7,7 @@ struct TermsView: View {
                 HStack(spacing: 12) {
                     DuckAvatar(size: 48, cornerRadius: 12)
                     Text("Terms of Use")
-                        .font(.title2).bold()
+                        .font(.title2).fontWeight(.bold)
                 }
 
                 Group {

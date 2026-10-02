@@ -151,7 +151,7 @@ struct NewsRow: View {
                     }
                 }
                 Text(item.title)
-                    .font(.subheadline).bold()
+                    .font(.subheadline).fontWeight(.bold)
                     .foregroundColor(.primary)
                     .lineLimit(2)
                 Text("\(item.firmware) • \(prettyDate(item.date))")
@@ -234,7 +234,7 @@ struct NewsDetailView: View {
                     if item.isNew { Badge(text: "NEW", color: .red) }
                 }
                 Text(item.title)
-                    .font(.title2).bold()
+                    .font(.title2).fontWeight(.bold)
                 Text(item.body)
                     .font(.body)
                     .foregroundColor(.primary)
