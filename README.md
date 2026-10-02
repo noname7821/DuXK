@@ -1,7 +1,6 @@
 # DuXK 🦆 — PS4 / PS5 Jailbreak Notifier
 
-SwiftUI app, TrollStore-style clean UI, iOS 14.0+ all devices.
-All texts in English.
+SwiftUI app, clean UI, iOS 14.0+ all devices.
 
 ## 1. Create project in Xcode (Mac)
 
