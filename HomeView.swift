@@ -1,4 +1,3 @@
-// Home screen
 import SwiftUI
 
 struct HomeView: View {
@@ -10,7 +9,6 @@ struct HomeView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
-                    // Header card
                     HStack(spacing: 14) {
                         Image("duck")
                             .resizable()
@@ -34,7 +32,6 @@ struct HomeView: View {
                     .cornerRadius(18)
                     .padding(.horizontal)
 
-                    // Main buttons
                     VStack(spacing: 12) {
                         HomeButton(
                             icon: "lock.open.fill",
@@ -52,7 +49,6 @@ struct HomeView: View {
                     }
                     .padding(.horizontal)
 
-                    // Recent list preview
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
                             Text("Recent News")
@@ -109,7 +105,6 @@ struct HomeView: View {
     }
 }
 
-// Big card button
 struct HomeButton: View {
     var icon: String
     var title: String
@@ -147,7 +142,6 @@ struct HomeButton: View {
     }
 }
 
-// Row + list + detail
 struct NewsRow: View {
     var item: NewsItem
     var body: some View {

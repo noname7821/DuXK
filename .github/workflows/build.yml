@@ -1,0 +1,34 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check files
+        run: |
+          ls -la
+          test -f DuXKApp.swift
+          test -f ContentView.swift
+          test -f HomeView.swift
+          test -f UpdatesView.swift
+          test -f SettingsView.swift
+          test -f fallbackNews.json
+          test -f duxk-feed.json
+
+      - name: Validate JSON
+        run: |
+          python3 -c "import json; json.load(open('fallbackNews.json')); json.load(open('duxk-feed.json')); print('JSON ok')"
+
+      - name: Check iOS14 API
+        run: |
+          ! grep -r "NavigationStack" --include="*.swift" . || (echo "NavigationStack not allowed" && exit 1)
+          ! grep -ri "trollstore" --include="*.swift" --include="*.md" . || (echo "blocked word found" && exit 1)
+          echo "API check ok"

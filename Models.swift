@@ -1,4 +1,3 @@
-// Data models
 import Foundation
 
 enum ConsoleType: String, Codable, CaseIterable {
@@ -25,7 +24,6 @@ struct NewsItem: Identifiable, Codable {
     var url: String
     var isNew: Bool
 
-    // Sort helper
     var dateValue: Date {
         let f = ISO8601DateFormatter()
         return f.date(from: date) ?? Date.distantPast

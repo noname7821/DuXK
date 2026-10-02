@@ -1,4 +1,3 @@
-// Settings: terms, credits, sources
 import SwiftUI
 
 struct SettingsView: View {
@@ -8,7 +7,6 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             List {
-                // Notifications
                 Section(header: Text("Notifications")) {
                     Toggle(isOn: $notifsOn) {
                         Label("Jailbreak Alerts", systemImage: "bell.fill")
@@ -25,14 +23,12 @@ struct SettingsView: View {
                     .foregroundColor(.secondary)
                 }
 
-                // Terms
                 Section(header: Text("Legal")) {
                     NavigationLink(destination: TermsView()) {
                         Label("Read Terms", systemImage: "doc.text.fill")
                     }
                 }
 
-                // Credits
                 Section(header: Text("Credits")) {
                     Link(destination: URL(string: "https://www.tiktok.com/@duxk40?is_from_webapp=1&sender_device=pc")!) {
                         HStack(spacing: 12) {
@@ -57,7 +53,6 @@ struct SettingsView: View {
                     }
                 }
 
-                // Sources
                 Section(header: Text("Sources"), footer: Text("DuXK checks these sites for new jailbreak and firmware info.")) {
                     ForEach(JailbreakService.shared.sources, id: \.name) { s in
                         Link(destination: URL(string: s.url)!) {
@@ -73,7 +68,6 @@ struct SettingsView: View {
                     }
                 }
 
-                // App
                 Section(header: Text("App")) {
                     HStack {
                         Text("Version")

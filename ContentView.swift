@@ -1,4 +1,3 @@
-// Main tab routing
 import SwiftUI
 
 struct ContentView: View {
@@ -14,7 +13,6 @@ struct ContentView: View {
                     showWelcome = true
                 })
             } else if !accepted {
-                // Placeholder behind welcome sheet
                 HomePlaceholder()
                     .onAppear { showWelcome = true }
                     .fullScreenCover(isPresented: $showWelcome) {

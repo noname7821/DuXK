@@ -1,4 +1,3 @@
-// Terms screen
 import SwiftUI
 
 struct TermsView: View {

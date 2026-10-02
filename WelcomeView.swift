@@ -1,4 +1,3 @@
-// Welcome popup
 import SwiftUI
 
 struct WelcomeView: View {
@@ -9,7 +8,6 @@ struct WelcomeView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
-                    // Duck icon (add duck.png to Assets)
                     Image("duck")
                         .resizable()
                         .scaledToFit()
@@ -57,7 +55,6 @@ struct WelcomeView: View {
                 .padding(.bottom, 12)
             }
 
-            // Bottom buttons
             VStack(spacing: 10) {
                 Button(action: onAccept) {
                     Text("Accept & Continue")

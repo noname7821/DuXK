@@ -1,4 +1,3 @@
-// System updates + patches
 import SwiftUI
 
 struct UpdatesView: View {

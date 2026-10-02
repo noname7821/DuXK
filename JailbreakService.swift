@@ -1,4 +1,3 @@
-// Feed sources + loading
 import Foundation
 import Combine
 
@@ -10,10 +9,8 @@ class JailbreakService: ObservableObject {
     @Published var isLoading = false
     @Published var lastUpdated: Date?
 
-    // Remote feed you can update anytime (create this file in your GitHub)
-    private let remoteURL = URL(string: "https://raw.githubusercontent.com/duxk40/duxk-feed/main/duxk-feed.json")!
+    private let remoteURL = URL(string: "https://raw.githubusercontent.com/noname7821/DuXK/main/duxk-feed.json")!
 
-    // Public sources shown in Settings
     let sources: [(name: String, url: String)] = [
         ("Wololo.net", "https://wololo.net"),
         ("PSX-Place", "https://psx-place.com"),
@@ -32,7 +29,6 @@ class JailbreakService: ObservableObject {
         loadFallback()
     }
 
-    // First load from bundle
     func loadFallback() {
         if let url = Bundle.main.url(forResource: "fallbackNews", withExtension: "json"),
            let data = try? Data(contentsOf: url),
@@ -40,13 +36,11 @@ class JailbreakService: ObservableObject {
             self.news = feed.news.sorted { $0.dateValue > $1.dateValue }
             self.firmwares = feed.firmwares
         } else {
-            // Built-in fallback if json missing
             self.news = Self.builtinNews
             self.firmwares = Self.builtinFirmware
         }
     }
 
-    // Fetch remote + notify on new
     func refresh(completion: ((Bool) -> Void)? = nil) {
         isLoading = true
         let task = URLSession.shared.dataTask(with: remoteURL) { data, _, _ in
@@ -64,7 +58,6 @@ class JailbreakService: ObservableObject {
         task.resume()
     }
 
-    // Compare + notify
     func applyNewFeed(_ feed: Feed) {
         let oldIDs = Set(UserDefaults.standard.stringArray(forKey: seenKey) ?? [])
         let sorted = feed.news.sorted { $0.dateValue > $1.dateValue }
@@ -74,25 +67,20 @@ class JailbreakService: ObservableObject {
         self.firmwares = feed.firmwares
         self.lastUpdated = Date()
 
-        // Save seen
         let allIDs = sorted.map { $0.id }
         UserDefaults.standard.set(allIDs, forKey: seenKey)
 
-        // Notify for each fresh item
         for item in fresh.prefix(3) {
             NotificationManager.shared.notifyNews(item)
         }
     }
 
-    // Mark all as seen (stops "NEW" badge)
     func markAllSeen() {
         let ids = news.map { $0.id }
         UserDefaults.standard.set(ids, forKey: seenKey)
-        // Clear flags locally
         for i in news.indices { news[i].isNew = false }
     }
 
-    // Filter helpers
     var jailbreaks: [NewsItem] {
         news.filter { $0.type == .jailbreak || $0.type == .progress }
     }
@@ -101,7 +89,6 @@ class JailbreakService: ObservableObject {
         news.filter { $0.type == .update || $0.type == .patch }
     }
 
-    // Built-in data if no files
     static var builtinNews: [NewsItem] = [
         NewsItem(id: "ps4-1100-pppwn", title: "PS4 11.00 PPPwn Jailbreak Available", body: "PPPwn exploit by TheOfficialFloW supports PS4 on firmware 11.00 and below. Run GoldHEN after exploit for homebrew. Stay on 11.00 or lower, do NOT update if you want homebrew.", date: "2024-05-10T12:00:00Z", type: .jailbreak, console: .ps4, firmware: "11.00", url: "https://github.com/TheOfficialFloW/PPPwn", isNew: true),
         NewsItem(id: "ps4-900-stable", title: "PS4 9.00 Still Most Stable", body: "Firmware 9.00 with pOOBs4 remains the most stable option. If you are on 9.00, stay there. 9.60+ users should wait, no stable port yet.", date: "2024-04-02T12:00:00Z", type: .jailbreak, console: .ps4, firmware: "9.00", url: "https://wololo.net", isNew: false),

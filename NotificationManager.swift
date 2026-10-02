@@ -1,4 +1,3 @@
-// Local notifications
 import Foundation
 import UserNotifications
 import UIKit
@@ -30,7 +29,6 @@ class NotificationManager: NSObject, ObservableObject {
         }
     }
 
-    // Called when new feed item arrives
     func notifyNews(_ item: NewsItem) {
         let content = UNMutableNotificationContent()
         content.title = item.type.rawValue + " • " + item.console.rawValue + " " + item.firmware
