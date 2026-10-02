@@ -70,13 +70,13 @@ struct MainTabs: View {
             )
         }
         .fullScreenCover(isPresented: $remote.shutdownActive) {
-            ShutdownView(discordInvite: remote.discordInvite)
+            ShutdownView()
         }
     }
 }
 
 struct ShutdownView: View {
-    var discordInvite: String = ""
+    @EnvironmentObject var remote: RemoteConfig
     @State private var seconds = 5
 
     var body: some View {
@@ -88,7 +88,7 @@ struct ShutdownView: View {
                 .font(.title).bold()
             Text("Sorry, DuXK got shut down.")
                 .font(.headline)
-            if let url = URL(string: discordInvite), discordInvite.hasPrefix("https://") {
+            if remote.hasValidDiscord, let url = URL(string: remote.discordInvite) {
                 Link(destination: url) {
                     Text("Any other infos can you find in our Discord Server.")
                         .font(.body)
