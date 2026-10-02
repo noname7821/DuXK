@@ -5,31 +5,33 @@ struct UpdatesView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(service.firmwares) { fw in
-                        FirmwareCard(fw: fw)
-                    }
-                    .padding(.horizontal)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Patch News")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        ForEach(service.updates) { item in
-                            NavigationLink(destination: NewsDetailView(item: item)) {
-                                NewsRow(item: item)
-                            }
-                            .buttonStyle(.plain)
+            ZStack {
+                Color(.systemGroupedBackground).ignoresSafeArea()
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(service.firmwares) { fw in
+                            FirmwareCard(fw: fw)
                         }
+                        .padding(.horizontal)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Patch News")
+                                .font(.headline)
+                                .padding(.horizontal)
+                            ForEach(service.updates) { item in
+                                NavigationLink(destination: NewsDetailView(item: item)) {
+                                    NewsRow(item: item)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.top, 8)
+                        .padding(.bottom, 20)
                     }
-                    .padding(.top, 8)
-                    .padding(.bottom, 20)
+                    .padding(.top, 12)
                 }
-                .padding(.top, 12)
             }
             .navigationTitle("Updates & Patches")
-            .background(Color(.systemGroupedBackground))
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

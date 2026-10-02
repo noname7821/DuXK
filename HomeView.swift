@@ -24,8 +24,13 @@ struct HomeView: View {
                         }
                     }
                     .padding()
-                    .background(Color(.secondarySystemBackground))
+                    .background(Color(.systemBackground))
                     .cornerRadius(18)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color(.separator).opacity(0.4), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
                     .padding(.horizontal)
 
                     VStack(spacing: 12) {
@@ -200,25 +205,27 @@ struct NewsListView: View {
     var title: String
     var items: [NewsItem]
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                ForEach(items) { item in
-                    NavigationLink(destination: NewsDetailView(item: item)) {
-                        NewsRow(item: item)
+        ZStack {
+            Color(.systemGroupedBackground).ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(items) { item in
+                        NavigationLink(destination: NewsDetailView(item: item)) {
+                            NewsRow(item: item)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                    if items.isEmpty {
+                        Text("No entries yet.")
+                            .foregroundColor(.secondary)
+                            .padding()
+                    }
                 }
-                if items.isEmpty {
-                    Text("No entries yet.")
-                        .foregroundColor(.secondary)
-                        .padding()
-                }
+                .padding(.top, 10)
+                .padding(.bottom, 20)
             }
-            .padding(.top, 10)
-            .padding(.bottom, 20)
         }
         .navigationTitle(title)
-        .background(Color(.systemGroupedBackground))
     }
 }
 
