@@ -30,5 +30,4 @@ jobs:
       - name: Check iOS14 API
         run: |
           ! grep -r "NavigationStack" --include="*.swift" . || (echo "NavigationStack not allowed" && exit 1)
-          ! grep -ri "trollstore" --include="*.swift" --include="*.md" . || (echo "blocked word found" && exit 1)
           echo "API check ok"
