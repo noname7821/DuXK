@@ -1,0 +1,66 @@
+{
+  "news": [
+    {
+      "id": "ps4-1100-pppwn",
+      "title": "PS4 11.00 PPPwn Jailbreak Available",
+      "body": "PPPwn exploit by TheOfficialFloW supports PS4 on firmware 11.00 and below. Run GoldHEN after exploit for homebrew. Stay on 11.00 or lower, do NOT update if you want homebrew.",
+      "date": "2024-05-10T12:00:00Z",
+      "type": "Jailbreak",
+      "console": "PS4",
+      "firmware": "11.00",
+      "url": "https://github.com/TheOfficialFloW/PPPwn",
+      "isNew": true
+    },
+    {
+      "id": "ps5-umtx-761",
+      "title": "PS5 UMTX Jailbreak up to 7.61",
+      "body": "UMTX kernel exploit chain supports PS5 firmwares up to 7.61 with ItemzFlow / etaHEN. Higher firmwares are patched. Do not update past 7.61.",
+      "date": "2025-06-15T12:00:00Z",
+      "type": "Jailbreak",
+      "console": "PS5",
+      "firmware": "7.61",
+      "url": "https://wololo.net",
+      "isNew": true
+    },
+    {
+      "id": "ps5-progress-new",
+      "title": "New PS5 Exploit In Progress",
+      "body": "Developers reported progress on a new userland entry point. No release yet. Stay on lowest firmware possible and disable auto-updates.",
+      "date": "2025-11-20T12:00:00Z",
+      "type": "In Progress",
+      "console": "PS5",
+      "firmware": "TBD",
+      "url": "https://www.psxhax.com",
+      "isNew": true
+    }
+  ],
+  "firmwares": [
+    {
+      "id": "ps4-1250",
+      "console": "PS4",
+      "version": "12.50",
+      "date": "2025-03-10",
+      "notes": "Security fixes. Patches PPPwn. No jailbreak. Stay below 11.00 for homebrew.",
+      "jailbreakStatus": "Patched - No Jailbreak",
+      "isPatched": true
+    },
+    {
+      "id": "ps4-1100",
+      "console": "PS4",
+      "version": "11.00",
+      "date": "2024-04-10",
+      "notes": "Last vulnerable to PPPwn. Use PPPwn + GoldHEN.",
+      "jailbreakStatus": "Vulnerable - PPPwn",
+      "isPatched": false
+    },
+    {
+      "id": "ps5-761",
+      "console": "PS5",
+      "version": "7.61",
+      "date": "2024-08-10",
+      "notes": "Last version supporting UMTX. Use etaHEN. Disable updates.",
+      "jailbreakStatus": "Vulnerable - UMTX",
+      "isPatched": false
+    }
+  ]
+}
