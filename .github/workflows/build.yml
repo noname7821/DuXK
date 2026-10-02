@@ -14,7 +14,8 @@ jobs:
 
       - name: Check files
         run: |
-          ls -la
+          test -f DuXK.xcodeproj/project.pbxproj
+          test -f Info.plist
           test -f DuXKApp.swift
           test -f ContentView.swift
           test -f HomeView.swift
@@ -31,3 +32,28 @@ jobs:
         run: |
           ! grep -r "NavigationStack" --include="*.swift" . || (echo "NavigationStack not allowed" && exit 1)
           echo "API check ok"
+
+  ipa:
+    needs: check
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode version
+        run: xcodebuild -version
+
+      - name: Archive
+        run: |
+          xcodebuild -project DuXK.xcodeproj -target DuXK -configuration Release -destination 'generic/platform=iOS' -archivePath build/DuXK.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Pack IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/DuXK.xcarchive/Products/Applications/DuXK.app Payload/
+          zip -r DuXK-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: DuXK-unsigned
+          path: DuXK-unsigned.ipa
