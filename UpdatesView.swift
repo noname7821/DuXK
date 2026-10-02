@@ -51,7 +51,7 @@ struct FirmwareCard: View {
             Text(fw.notes)
                 .font(.subheadline)
             Text(fw.jailbreakStatus)
-                .font(.caption).fontWeight(.bold)
+                .font(.system(size: 12, weight: .bold))
                 .foregroundColor(fw.isPatched ? .red : .green)
         }
         .padding()

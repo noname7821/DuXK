@@ -85,7 +85,7 @@ struct ShutdownView: View {
             DuckAvatar(size: 110, cornerRadius: 26)
                 .shadow(radius: 8)
             Text("DuXK")
-                .font(.title).fontWeight(.bold)
+                .font(.system(size: 28, weight: .bold))
             Text("Sorry, DuXK got shut down.")
                 .font(.headline)
             if remote.hasValidDiscord, let url = URL(string: remote.discordInvite) {
@@ -93,7 +93,7 @@ struct ShutdownView: View {
                     Text("Any other infos can you find in our Discord Server.")
                         .font(.body)
                         .foregroundColor(.blue)
-                        .underline()
+                        .underline(true, color: .blue)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 }
@@ -129,7 +129,7 @@ struct HomePlaceholder: View {
         VStack(spacing: 12) {
             DuckAvatar(size: 60, cornerRadius: 15)
             Text("DuXK")
-                .font(.title).fontWeight(.bold)
+                .font(.system(size: 28, weight: .bold))
         }
     }
 }
