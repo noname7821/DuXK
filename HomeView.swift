@@ -77,7 +77,7 @@ struct HomeView: View {
             .background(
                 NavigationLink(destination: UpdatesView(), isActive: $showUpdates) { EmptyView() }
             )
-            .onAppear { service.refresh() }
+            .onAppear { service.refreshIfStale() }
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }

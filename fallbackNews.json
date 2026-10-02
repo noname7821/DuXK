@@ -12,17 +12,6 @@
       "isNew": true
     },
     {
-      "id": "ps4-1400-patch",
-      "title": "PS4 14.00 Released Sept 16 2026 - Do NOT Update",
-      "body": "PS4 14.00 is out since Sept 16 2026 and patches the 13.52 chain. If you want homebrew, stay on 13.52 or lower. Updating kills GoldHEN.",
-      "date": "2026-09-16T12:00:00Z",
-      "type": "Patch",
-      "console": "PS4",
-      "firmware": "14.00",
-      "url": "https://www.playstation.com/en-us/support/hardware/ps4/system-software/",
-      "isNew": true
-    },
-    {
       "id": "ps4-1352-jb",
       "title": "PS4 13.52 Is Latest Exploitable (Sept 2026)",
       "body": "As of Sept 20 2026 ConsoleMods lists 13.52 as latest publicly exploitable PS4 firmware with GoldHEN. 14.00 is patched. Stay on 13.52 or lower, disable auto-updates.",
@@ -31,6 +20,17 @@
       "console": "PS4",
       "firmware": "13.52",
       "url": "https://consolemods.org/wiki/PS4:Exploit_Chart",
+      "isNew": true
+    },
+    {
+      "id": "ps4-1400-patch",
+      "title": "PS4 14.00 Released Sept 16 2026 - Do NOT Update",
+      "body": "PS4 14.00 is out since Sept 16 2026 and patches the 13.52 chain. If you want homebrew, stay on 13.52 or lower. Updating kills GoldHEN.",
+      "date": "2026-09-16T12:00:00Z",
+      "type": "Patch",
+      "console": "PS4",
+      "firmware": "14.00",
+      "url": "https://www.playstation.com/en-us/support/hardware/ps4/system-software/",
       "isNew": true
     },
     {
@@ -45,17 +45,6 @@
       "isNew": false
     },
     {
-      "id": "ps4-1100-pppwn",
-      "title": "PS4 11.00 PPPwn Jailbreak Available",
-      "body": "PPPwn exploit by TheOfficialFloW supports PS4 on firmware 11.00 and below. Run GoldHEN after exploit for homebrew. Stay on 11.00 or lower, do NOT update if you want homebrew.",
-      "date": "2024-05-10T12:00:00Z",
-      "type": "Jailbreak",
-      "console": "PS4",
-      "firmware": "11.00",
-      "url": "https://github.com/TheOfficialFloW/PPPwn",
-      "isNew": false
-    },
-    {
       "id": "ps5-umtx-761",
       "title": "PS5 UMTX Stable up to 7.61",
       "body": "UMTX kernel exploit chain is most stable up to PS5 7.61 with ItemzFlow / etaHEN. Newer firmwares have only partial support. Do not update past 7.61 for full jailbreak.",
@@ -64,6 +53,17 @@
       "console": "PS5",
       "firmware": "7.61",
       "url": "https://github.com/PS5Dev/PS5-UMTX-Jailbreak",
+      "isNew": false
+    },
+    {
+      "id": "ps4-1100-pppwn",
+      "title": "PS4 11.00 PPPwn Jailbreak Available",
+      "body": "PPPwn exploit by TheOfficialFloW supports PS4 on firmware 11.00 and below. Run GoldHEN after exploit for homebrew. Stay on 11.00 or lower, do NOT update if you want homebrew.",
+      "date": "2024-05-10T12:00:00Z",
+      "type": "Jailbreak",
+      "console": "PS4",
+      "firmware": "11.00",
+      "url": "https://github.com/TheOfficialFloW/PPPwn",
       "isNew": false
     }
   ],

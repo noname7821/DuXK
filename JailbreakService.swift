@@ -26,9 +26,15 @@ class JailbreakService: ObservableObject {
     ]
 
     private let seenKey = "duxk.seenIDs"
+    private let cacheKey = "duxk.cachedFeed"
+    private let lastRefreshKey = "duxk.lastRefresh"
+    private let autoInterval: TimeInterval = 6 * 60 * 60
+    private var autoTimer: Timer?
 
     init() {
         loadFallback()
+        loadCache()
+        startAutoRefresh()
     }
 
     func loadFallback() {
@@ -44,6 +50,22 @@ class JailbreakService: ObservableObject {
     }
 
     func refresh(completion: ((Bool) -> Void)? = nil) {
+        refreshForced(true, completion: completion)
+    }
+
+    /// Automatisch: nur laden wenn älter als 6h oder noch nie geladen.
+    /// `force=true` (Pull-to-Refresh / Button) lädt immer.
+    func refreshIfStale(completion: ((Bool) -> Void)? = nil) {
+        let last = UserDefaults.standard.double(forKey: lastRefreshKey)
+        if last > 0 && Date().timeIntervalSince1970 - last < autoInterval {
+            completion?(true)
+            return
+        }
+        refreshForced(false, completion: completion)
+    }
+
+    private func refreshForced(_ force: Bool, completion: ((Bool) -> Void)? = nil) {
+        if isLoading { completion?(false); return }
         isLoading = true
         let task = URLSession.shared.dataTask(with: remoteURL) { data, _, _ in
             DispatchQueue.main.async {
@@ -54,10 +76,38 @@ class JailbreakService: ObservableObject {
                     return
                 }
                 self.applyNewFeed(feed)
+                self.saveCache(data)
+                UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: self.lastRefreshKey)
                 completion?(true)
             }
         }
         task.resume()
+        _ = force
+    }
+
+    func startAutoRefresh() {
+        stopAutoRefresh()
+        refreshIfStale()
+        autoTimer = Timer.scheduledTimer(withTimeInterval: autoInterval, repeats: true) { [weak self] _ in
+            self?.refreshIfStale()
+        }
+    }
+
+    func stopAutoRefresh() {
+        autoTimer?.invalidate()
+        autoTimer = nil
+    }
+
+    private func saveCache(_ data: Data) {
+        UserDefaults.standard.set(data, forKey: cacheKey)
+    }
+
+    private func loadCache() {
+        guard let data = UserDefaults.standard.data(forKey: cacheKey),
+              let feed = try? JSONDecoder().decode(Feed.self, from: data),
+              !feed.news.isEmpty else { return }
+        self.news = feed.news.sorted { $0.dateValue > $1.dateValue }
+        self.firmwares = feed.firmwares
     }
 
     func applyNewFeed(_ feed: Feed) {
