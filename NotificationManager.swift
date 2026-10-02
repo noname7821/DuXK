@@ -37,7 +37,7 @@ class NotificationManager: NSObject, ObservableObject {
         content.userInfo = ["id": item.id, "url": item.url]
 
         let req = UNNotificationRequest(identifier: item.id, content: content, trigger: nil)
-        UNUserNotificationCenter.current().add(req, completionHandler: nil)
+        UNUserNotificationCenter.current().add(req, withCompletionHandler: nil)
     }
 
     func openSystemSettings() {
