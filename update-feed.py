@@ -2,14 +2,18 @@
 """DuXK feed auto-updater.
 
 Laeuft als GitHub Action (siehe .github/workflows/update-feed.yml).
-- Holt neueste etaHEN- + PPPwn-Releases ueber die GitHub API (kein Token noetig).
+- Holt neueste etaHEN-/GoldHEN-Releases ueber die GitHub API.
+- Erkennt neue Sony-Firmwares automatisch (PS4: Wikipedia-Infobox,
+  PS5: PlayStation-Blog/PSXHAX-RSS als Best-Effort).
 - Aktualisiert duxk-feed.json + fallbackNews.json (identisch halten!).
-- OFW-Versionen (Sony) stehen unten als Konstanten: nur bei neuem
-  Sony-Update einmalig hochsetzen, Rest geht automatisch.
+- Sicherheit: OFW nur HOCH, nie runter. Neue OFW immer als gepatcht.
+  Vulnerable-Eintraege fasst der Bot nie an (nur manuell).
+- Manuelle Konstanten unten sind der Mindeststand (Fallback).
 
 Nur Stdlib: python3 update-feed.py
 """
 import json
+import re
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -106,22 +110,134 @@ def main():
             e["body"] += f" (Upstream {pppwn['sha']}, {pppwn['date'][:10]})."
             changed.append(f"PPPwn {pppwn['sha']}")
 
-    # OFW-Karten synchron zu den Konstanten halten (kein Scraping, kein Raten)
-    for f in feed["firmwares"]:
-        if f["id"] == "ps4-1400":
-            f["version"], f["date"] = PS4_LATEST["version"], PS4_LATEST["date"]
-        elif f["id"] == "ps4-1352":
-            f["version"], f["date"] = PS4_EXPLOITABLE["version"], PS4_EXPLOITABLE["date"]
-        elif f["id"] == "ps5-1410":
-            f["version"], f["date"] = PS5_LATEST["version"], PS5_LATEST["date"]
-        elif f["id"] == "ps5-761":
-            f["version"], f["date"] = PS5_STABLE_JB["version"], PS5_STABLE_JB["date"]
+    # --- Sony-OFW automatisch erkennen (nur hoch, nie runter) ---
+    detect_sony_ofw(feed, by_id, changed)
 
     feed["news"] = sorted(feed["news"], key=lambda n: n["date"], reverse=True)
     out = json.dumps(feed, ensure_ascii=False, indent=2) + "\n"
     open(FEED, "w", encoding="utf-8").write(out)
     open(FALLBACK, "w", encoding="utf-8").write(out)
     print("changed:", changed if changed else "none (feed aktuell)")
+
+
+def key4(v):
+    p = re.findall(r"\d+", v or "")[:2]
+    return tuple(int(x) for x in p) if len(p) == 2 else (0, 0)
+
+
+def key5(v):
+    m = re.search(r"(\d+)\.(\d+)-(\d+)\.(\d+)", v or "")
+    return tuple(int(x) for x in m.groups()) if m else (0, 0, 0, 0)
+
+
+def wiki_ps4_latest():
+    """PS4-Latest aus Wikipedia-Infobox. Gibt (version, datum|None) oder None."""
+    try:
+        url = ("https://en.wikipedia.org/w/api.php?action=query&prop=revisions"
+               "&rvprop=content&format=json&formatversion=2"
+               "&titles=PlayStation_4_system_software")
+        req = urllib.request.Request(url, headers={"User-Agent": "DuXK-feed-updater/1.0"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            c = json.load(r)["query"]["pages"][0]["revisions"][0]["content"]
+        m = re.search(r"latest_release_version\s*=\s*(\d+\.\d+)", c)
+        if not m:
+            return None
+        d = re.search(r"latest_release_date\s*=\s*\{\{[^}]*?(\d{4})\|(\d{1,2})\|(\d{1,2})", c)
+        date = f"{d.group(1)}-{int(d.group(2)):02d}-{int(d.group(3)):02d}" if d else None
+        return (m.group(1), date)
+    except Exception as e:
+        print(f"WARN wiki ps4: {e}")
+        return None
+
+
+def rss_ps5_candidates():
+    """PS5-Kandidaten aus PlayStation-Blog + PSXHAX RSS.
+    Gibt Liste (full, short, datum|None, url). Best-Effort."""
+    out = []
+    feeds = [
+        "https://blog.playstation.com/feed/",
+        "https://www.psxhax.com/forums/-/index.rss",
+    ]
+    for url in feeds:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                xml = r.read().decode("utf-8", "ignore")
+        except Exception as e:
+            print(f"WARN rss {url}: {e}")
+            continue
+        for it in re.findall(r"<item>(.*?)</item>", xml, re.DOTALL):
+            t = re.sub(r"<!\[CDATA\[|\]\]>", "", re.search(r"<title>(.*?)</title>", it, re.DOTALL).group(1))
+            if "ps5" not in t.lower() or "system software" not in t.lower():
+                continue
+            m = re.search(r"(\d{2}\.\d{2}-\d+\.\d+(?:\.\d+)?)", t)
+            if not m:
+                continue
+            pub = re.search(r"<pubDate>(.*?)</pubDate>", it)
+            link = re.search(r"<link>(.*?)</link>", it)
+            try:
+                dt = datetime.strptime(pub.group(1)[:16], "%a, %d %b %Y").strftime("%Y-%m-%d") if pub else None
+            except Exception:
+                dt = None
+            short = m.group(1).split("-")[1].split(".")[0] + "." + m.group(1).split("-")[1].split(".")[1]
+            out.append((m.group(1), short, dt, link.group(1).strip() if link else ""))
+    return out
+
+
+def upsert_ofw_news(by_id, feed, nid, title, body, date_iso, ntype, console, fw, url):
+    e = by_id.get(nid)
+    if e and e.get("title") == title:
+        return False
+    if e is None:
+        e = {"id": nid, "title": "", "body": "", "date": date_iso, "type": ntype,
+             "console": console, "firmware": fw, "url": url, "isNew": True}
+        feed["news"].append(e)
+        by_id[nid] = e
+    e.update({"title": title, "body": body, "date": date_iso, "type": ntype,
+              "console": console, "firmware": fw, "url": url, "isNew": True})
+    return True
+
+
+def detect_sony_ofw(feed, by_id, changed):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    fwmap = {f["id"]: f for f in feed["firmwares"]}
+
+    # PS4: Wikipedia-Infobox, Boden = manuelle Konstante
+    cands = [(PS4_LATEST["version"], PS4_LATEST["date"])]
+    w = wiki_ps4_latest()
+    if w:
+        cands.append(w)
+    best = max(cands, key=lambda c: key4(c[0]))
+    card = fwmap.get("ps4-1400")
+    if card and key4(best[0]) > key4(card.get("version", "0.0")):
+        v, d = best[0], best[1] or today
+        card.update({"version": v, "date": d,
+                     "notes": f"Security fixes. Patches jailbreak chains. No jailbreak. Stay on 13.52 or lower.",
+                     "jailbreakStatus": "Patched - No Jailbreak", "isPatched": True})
+        if upsert_ofw_news(by_id, feed, "ps4-ofw-auto",
+                           f"PS4 {v} Released - Do NOT Update",
+                           f"PS4 {v} ({d}) patches jailbreak chains. Stay low, disable auto-updates.",
+                           f"{d}T12:00:00Z", "Patch", "PS4", v,
+                           "https://www.playstation.com/en-us/support/hardware/ps4/system-software/"):
+            changed.append(f"PS4 OFW {v} (auto)")
+
+    # PS5: Blog-/Forum-RSS, Boden = manuelle Konstante
+    pcands = [(PS5_LATEST["version"], PS5_LATEST["date"], "")]
+    for full, short, dt, link in rss_ps5_candidates():
+        pcands.append((f"{short} ({full})", dt or today, link))
+    best5 = max(pcands, key=lambda c: key5(c[0]))
+    card5 = fwmap.get("ps5-1410")
+    if card5 and key5(best5[0]) > key5(card5.get("version", "")):
+        v, d, link = best5[0], best5[1], best5[2] or "https://www.playstation.com/en-us/support/hardware/ps5/system-software/"
+        card5.update({"version": v, "date": d,
+                      "notes": "Security fixes. Patches UMTX/etaHEN. No jailbreak. Stay on 7.61 or lower.",
+                      "jailbreakStatus": "Patched - No Jailbreak", "isPatched": True})
+        short = v.split(" ")[0]
+        if upsert_ofw_news(by_id, feed, "ps5-ofw-auto",
+                           f"PS5 {v} Released - Do NOT Update",
+                           f"PS5 {v} ({d}) with security fixes. Stay on 7.61 or lower for jailbreak.",
+                           f"{d}T12:00:00Z", "System Update", "PS5", short, link):
+            changed.append(f"PS5 OFW {v} (auto)")
 
 
 if __name__ == "__main__":
