@@ -90,7 +90,7 @@ class PairingService: ObservableObject {
 
     func unlink() {
         guard let t = deviceToken else { return }
-        post("api/device/unlink", body: ["token": t]) { _ in }
+        post("api/device/unlink", body: ["token": t]) { _, _ in }
         deviceToken = nil
         account = nil
         error = nil
