@@ -29,22 +29,10 @@ jobs:
           test -f duxk-feed.json
           test -d Assets.xcassets
           test -f Assets.xcassets/duck.imageset/duck.jpg
-          test -f render.yaml
-          test -f web/package.json
-          test -f web/server.js
-          test -f web/public/index.html
-          test -f web/public/app.js
-          test -f web/public/styles.css
 
       - name: Validate JSON
         run: |
           python3 -c "import json; json.load(open('fallbackNews.json')); json.load(open('duxk-feed.json')); print('JSON ok')"
-
-      - name: Check web syntax
-        run: |
-          node --check web/server.js
-          node --check web/public/app.js
-          node -e "const p=require('./web/package.json'); ['express','sql.js','bcryptjs','multer','archiver','qrcode','speakeasy','cookie-parser'].forEach(d=>{if(!p.dependencies[d])throw new Error('missing '+d)}); console.log('deps ok')"
 
       - name: Check iOS14 API
         run: |

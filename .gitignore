@@ -5,4 +5,3 @@ build/
 *.ipa
 .xcode.env.local
 node_modules/
-web/data/
