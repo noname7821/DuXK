@@ -19,6 +19,12 @@ async function api(path, opt) {
   return j;
 }
 
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 function showAuth(which) {
   document.getElementById('form-login').classList.toggle('hidden', which !== 'login');
   document.getElementById('form-register').classList.toggle('hidden', which !== 'register');
@@ -32,6 +38,7 @@ async function boot() {
     enter(j.user);
   } catch (e) {
     document.getElementById('view-auth').classList.remove('hidden');
+    if (String(e.message).startsWith('Banned')) document.getElementById('auth-err').textContent = e.message;
   }
 }
 
@@ -43,6 +50,7 @@ function enter(u) {
   const img = document.getElementById('pf-img');
   if (u.avatar_url) { img.src = u.avatar_url; img.classList.remove('hidden'); document.getElementById('pf-duck').classList.add('hidden'); }
   else { img.classList.add('hidden'); document.getElementById('pf-duck').classList.remove('hidden'); }
+  document.getElementById('menu-admin').classList.toggle('hidden', !u.is_admin);
   go('home');
   loadAll();
 }
@@ -88,7 +96,9 @@ async function doLogout() {
 function go(v) {
   document.getElementById('view-home').classList.toggle('hidden', v !== 'home');
   document.getElementById('view-settings').classList.toggle('hidden', v !== 'settings');
+  document.getElementById('view-admin').classList.toggle('hidden', v !== 'admin');
   if (v === 'settings') loadSettings();
+  if (v === 'admin') loadAdmin();
 }
 
 async function loadAll() {
@@ -104,11 +114,18 @@ async function loadCodes() {
   j.codes.forEach(c => {
     const d = document.createElement('div');
     d.className = 'code';
-    d.innerHTML = '<span></span><button>Copy</button><button>Regenerate</button><button>Delete</button>';
-    d.children[0].textContent = c.code;
-    d.children[1].onclick = () => { navigator.clipboard.writeText(c.code); };
-    d.children[2].onclick = async () => { const r = await api('/api/codes/regenerate', { method: 'POST', body: { code: c.code } }); alert('New key: ' + r.code); loadCodes(); };
-    d.children[3].onclick = async () => { await api('/api/codes', { method: 'DELETE', body: { code: c.code } }); loadCodes(); };
+    const s = document.createElement('span');
+    s.textContent = c.code;
+    const b1 = document.createElement('button');
+    b1.textContent = 'Copy';
+    b1.onclick = () => { navigator.clipboard.writeText(c.code); };
+    const b2 = document.createElement('button');
+    b2.textContent = 'Regenerate';
+    b2.onclick = async () => { const r = await api('/api/codes/regenerate', { method: 'POST', body: { code: c.code } }); alert('New key: ' + r.code); loadCodes(); };
+    const b3 = document.createElement('button');
+    b3.textContent = 'Delete';
+    b3.onclick = async () => { await api('/api/codes', { method: 'DELETE', body: { code: c.code } }); loadCodes(); };
+    d.append(s, b1, b2, b3);
     cl.appendChild(d);
   });
   const dl = document.getElementById('dev-list');
@@ -118,10 +135,13 @@ async function loadCodes() {
     const d = document.createElement('div');
     d.className = 'dev';
     const av = ME.avatar_url ? '<img src="' + ME.avatar_url + '">' : '<span style="font-size:30px">🦆</span>';
-    d.innerHTML = av + '<div class="who"><b></b><span></span></div><button>Remove</button>';
+    d.innerHTML = av + '<div class="who"><b></b><span></span></div>';
     d.querySelector('b').textContent = 'Connected with ' + ME.username;
     d.querySelector('span').textContent = v.name + (v.model ? ' • ' + v.model : '');
-    d.querySelector('button').onclick = async () => { await api('/api/devices', { method: 'DELETE', body: { token: v.token } }); loadCodes(); };
+    const b = document.createElement('button');
+    b.textContent = 'Remove';
+    b.onclick = async () => { await api('/api/devices', { method: 'DELETE', body: { token: v.token } }); loadCodes(); };
+    d.appendChild(b);
     dl.appendChild(d);
   });
 }
@@ -143,13 +163,15 @@ async function loadPhotos() {
   PHOTOS.forEach((p, i) => {
     const c = document.createElement('div');
     c.className = 'cell';
-    c.innerHTML = '<img loading="lazy"><div class="tick">✓</div>';
-    c.children[0].src = p.url;
-    c.onclick = (e) => {
-      if (e.target.className === 'tick') { toggle(i); return; }
-      openLight(i);
-    };
-    c.children[1].onclick = () => toggle(i);
+    const im = document.createElement('img');
+    im.loading = 'lazy';
+    im.src = p.url;
+    const t = document.createElement('div');
+    t.className = 'tick';
+    t.textContent = '✓';
+    t.onclick = () => toggle(i);
+    c.append(im, t);
+    c.onclick = () => openLight(i);
     g.appendChild(c);
   });
 }
@@ -299,6 +321,42 @@ async function tfaOff() {
   try {
     const j = await api('/api/2fa/disable', { method: 'POST', body: { password: document.getElementById('tfa-pw').value } });
     enter(j.user); go('settings');
+  } catch (e) { err.textContent = e.message; }
+}
+
+async function loadAdmin() {
+  const err = document.getElementById('admin-err');
+  err.textContent = '';
+  try {
+    const j = await api('/api/admin/users');
+    const box = document.getElementById('admin-list');
+    box.innerHTML = '';
+    if (!j.users.length) box.innerHTML = '<p class="hint">No users.</p>';
+    j.users.forEach(u => {
+      const d = document.createElement('div');
+      d.className = 'user' + (u.banned ? ' banned' : '');
+      const badges = (u.is_admin ? '<span class="badge gold">admin</span> ' : '') + (u.banned ? '<span class="badge red">banned</span>' : '<span class="badge">active</span>');
+      d.innerHTML = '<div class="top"><b></b>' + badges + '</div>' +
+        '<div class="meta"></div>' +
+        (u.banned && u.ban_reason ? '<div class="meta">Reason: ' + esc(u.ban_reason) + '</div>' : '') +
+        '<div class="ops"><input placeholder="Ban reason"><button class="danger">Ban</button><button>Unban</button><button class="danger">Delete</button></div>';
+      d.querySelector('b').textContent = u.username + (u.email ? ' • ' + u.email : '');
+      d.querySelector('.meta').textContent = u.photos + ' photos • ' + u.devices + ' devices • ' + u.codes + ' keys';
+      const inp = d.querySelector('input');
+      const btns = d.querySelectorAll('button');
+      btns[0].onclick = async () => {
+        if (!inp.value.trim()) { err.textContent = 'Write a reason first'; return; }
+        await api('/api/admin/ban', { method: 'POST', body: { user_id: u.id, reason: inp.value.trim() } });
+        loadAdmin();
+      };
+      btns[1].onclick = async () => { await api('/api/admin/unban', { method: 'POST', body: { user_id: u.id } }); loadAdmin(); };
+      btns[2].onclick = async () => {
+        if (!confirm('Delete ' + u.username + ' and everything?')) return;
+        await api('/api/admin/users', { method: 'DELETE', body: { user_id: u.id } });
+        loadAdmin();
+      };
+      box.appendChild(d);
+    });
   } catch (e) { err.textContent = e.message; }
 }
 

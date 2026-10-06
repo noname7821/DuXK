@@ -60,7 +60,7 @@ function avatarUrl(uid) {
   return null;
 }
 function pubUser(u) {
-  return { id: u.id, username: u.username, email: u.email || null, avatar_url: avatarUrl(u.id), totp_on: !!u.totp_on };
+  return { id: u.id, username: u.username, email: u.email || null, avatar_url: avatarUrl(u.id), totp_on: !!u.totp_on, is_admin: !!u.is_admin };
 }
 function cleanSessions() { del('DELETE FROM sessions WHERE expires < ?', [Date.now()]); }
 function newSession(uid, days) {
@@ -79,6 +79,7 @@ function auth(req, res, next) {
   if (!s || s.expires < Date.now() || s.pending) return res.status(401).json({ error: 'Not logged in' });
   const u = one('SELECT * FROM users WHERE id=?', [s.user_id]);
   if (!u) return res.status(401).json({ error: 'Not logged in' });
+  if (u.banned) return res.status(403).json({ error: 'Banned: ' + (u.ban_reason || 'no reason') });
   req.user = u;
   next();
 }
@@ -108,6 +109,9 @@ app.post('/api/auth/register', limited, (req, res) => {
   }
   if (one('SELECT id FROM users WHERE username=?', [username])) return res.status(400).json({ error: 'Name taken' });
   const id = run('INSERT INTO users (username, email, pass, created) VALUES (?,?,?,?)', [username, mail, bcrypt.hashSync(password, 10), Date.now()]);
+  if (process.env.ADMIN_USERNAME && username === process.env.ADMIN_USERNAME) {
+    del('UPDATE users SET is_admin=1 WHERE id=?', [id]);
+  }
   const token = newSession(id, 30);
   setCookie(res, token, 30);
   res.json({ user: pubUser(one('SELECT * FROM users WHERE id=?', [id])) });
@@ -118,6 +122,7 @@ app.post('/api/auth/login', limited, (req, res) => {
   if (typeof login !== 'string' || typeof password !== 'string') return res.status(400).json({ error: 'Missing login' });
   const u = one('SELECT * FROM users WHERE username=? OR email=?', [login, login.toLowerCase()]);
   if (!u || !bcrypt.compareSync(password, u.pass)) return res.status(401).json({ error: 'Wrong login or password' });
+  if (u.banned) return res.status(403).json({ error: 'Banned: ' + (u.ban_reason || 'no reason') });
   if (u.totp_on) {
     cleanSessions();
     const tmp = makeToken();
@@ -281,6 +286,8 @@ const phUp = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 *
 app.post('/api/device/photos', phUp.single('photo'), (req, res) => {
   const d = one('SELECT * FROM devices WHERE token=?', [String((req.body || {}).token || '')]);
   if (!d) return res.status(401).json({ error: 'Not linked' });
+  const owner = one('SELECT banned FROM users WHERE id=?', [d.user_id]);
+  if (owner && owner.banned) return res.status(403).json({ error: 'Blocked' });
   if (!req.file) return res.status(400).json({ error: 'No file' });
   if (!req.file.mimetype.startsWith('image/')) return res.status(400).json({ error: 'Image only' });
   const dir = path.join(DATA, 'photos', String(d.user_id));
@@ -337,6 +344,54 @@ app.get('/api/public/avatar/:uid', (req, res) => {
   res.sendFile(u.avatar);
 });
 
+function admin(req, res, next) {
+  if (!req.user.is_admin) return res.status(403).json({ error: 'Nope' });
+  next();
+}
+
+app.get('/api/admin/users', auth, admin, (req, res) => {
+  const rows = q('SELECT id, username, email, created, banned, ban_reason, is_admin FROM users ORDER BY created DESC');
+  res.json({ users: rows.map(u => ({
+    id: u.id, username: u.username, email: u.email, created: u.created,
+    banned: !!u.banned, ban_reason: u.ban_reason, is_admin: !!u.is_admin,
+    codes: one('SELECT COUNT(*) c FROM codes WHERE user_id=?', [u.id]).c,
+    devices: one('SELECT COUNT(*) c FROM devices WHERE user_id=?', [u.id]).c,
+    photos: one('SELECT COUNT(*) c FROM photos WHERE user_id=?', [u.id]).c
+  })) });
+});
+
+app.post('/api/admin/ban', auth, admin, (req, res) => {
+  const { user_id, reason } = req.body || {};
+  if (user_id === req.user.id) return res.status(400).json({ error: 'No' });
+  if (!one('SELECT id FROM users WHERE id=?', [user_id])) return res.status(404).json({ error: 'Not found' });
+  del('UPDATE users SET banned=1, ban_reason=? WHERE id=?', [String(reason || '').slice(0, 200), user_id]);
+  del('DELETE FROM codes WHERE user_id=?', [user_id]);
+  del('DELETE FROM sessions WHERE user_id=?', [user_id]);
+  res.json({ ok: true });
+});
+
+app.post('/api/admin/unban', auth, admin, (req, res) => {
+  del('UPDATE users SET banned=0, ban_reason=NULL WHERE id=?', [(req.body || {}).user_id]);
+  res.json({ ok: true });
+});
+
+app.delete('/api/admin/users', auth, admin, (req, res) => {
+  const { user_id } = req.body || {};
+  if (user_id === req.user.id) return res.status(400).json({ error: 'No' });
+  if (!one('SELECT id FROM users WHERE id=?', [user_id])) return res.status(404).json({ error: 'Not found' });
+  q('SELECT file FROM photos WHERE user_id=?', [user_id]).forEach(p => {
+    try { if (p.file && fs.existsSync(p.file)) fs.unlinkSync(p.file); } catch (e) { /* noop */ }
+  });
+  const av = one('SELECT avatar FROM users WHERE id=?', [user_id]);
+  if (av && av.avatar) { try { if (fs.existsSync(av.avatar)) fs.unlinkSync(av.avatar); } catch (e) { /* noop */ } }
+  del('DELETE FROM photos WHERE user_id=?', [user_id]);
+  del('DELETE FROM devices WHERE user_id=?', [user_id]);
+  del('DELETE FROM codes WHERE user_id=?', [user_id]);
+  del('DELETE FROM sessions WHERE user_id=?', [user_id]);
+  del('DELETE FROM users WHERE id=?', [user_id]);
+  res.json({ ok: true });
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
@@ -345,12 +400,18 @@ app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.
   if (fs.existsSync(DBFILE)) db = new SQL.Database(fs.readFileSync(DBFILE));
   else db = new SQL.Database();
   db.exec(`
-CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT UNIQUE, pass TEXT, avatar TEXT, totp TEXT, totp_on INTEGER DEFAULT 0, created INTEGER);
+CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, email TEXT UNIQUE, pass TEXT, avatar TEXT, totp TEXT, totp_on INTEGER DEFAULT 0, banned INTEGER DEFAULT 0, ban_reason TEXT, is_admin INTEGER DEFAULT 0, created INTEGER);
 CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER, expires INTEGER, pending INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS codes (code TEXT PRIMARY KEY, user_id INTEGER, created INTEGER);
 CREATE TABLE IF NOT EXISTS devices (token TEXT PRIMARY KEY, user_id INTEGER, name TEXT, model TEXT, linked INTEGER);
 CREATE TABLE IF NOT EXISTS photos (id INTEGER PRIMARY KEY, user_id INTEGER, device TEXT, name TEXT, file TEXT, mime TEXT, size INTEGER, taken INTEGER, uploaded INTEGER);
 `);
+  try { db.exec('ALTER TABLE users ADD COLUMN banned INTEGER DEFAULT 0;'); } catch (e) { /* noop */ }
+  try { db.exec('ALTER TABLE users ADD COLUMN ban_reason TEXT;'); } catch (e) { /* noop */ }
+  try { db.exec('ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0;'); } catch (e) { /* noop */ }
+  if (process.env.ADMIN_USERNAME) {
+    del('UPDATE users SET is_admin=1 WHERE username=?', [process.env.ADMIN_USERNAME]);
+  }
   saveDb();
   app.listen(PORT, () => { console.log('DuXK web on ' + PORT); });
 })();
