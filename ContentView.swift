@@ -44,6 +44,12 @@ struct MainTabs: View {
                     Text("Setup")
                 }
 
+            HomeView()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Home")
+                }
+
             SettingsView()
                 .tabItem {
                     Image(systemName: "gearshape.fill")
