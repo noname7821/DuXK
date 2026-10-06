@@ -44,6 +44,10 @@
 				A1B2C3D400020001A2B3C1C1,
 				A1B2C3D400020001A2B3C1D1,
 				A1B2C3D400020001A2B3C1E1,
+				A1B2C3D400020001A2B3C203,
+				A1B2C3D400020001A2B3C205,
+				A1B2C3D400020001A2B3C207,
+				A1B2C3D400020001A2B3C209,
 				A1B2C3D400020001A2B3C201,
 				A1B2C3D400010001A2B3C003,
 			);
@@ -90,6 +94,10 @@
 				A1B2C3D400020001A2B3C192,
 				A1B2C3D400020001A2B3C1D2,
 				A1B2C3D400020001A2B3C1E2,
+				A1B2C3D400020001A2B3C204,
+				A1B2C3D400020001A2B3C206,
+				A1B2C3D400020001A2B3C208,
+				A1B2C3D400020001A2B3C20A,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +401,46 @@
 			lastKnownFileType = folder.assetcatalog;
 			path = Assets.xcassets;
 			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C203 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = Config.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C204 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C203;
+		};
+		A1B2C3D400020001A2B3C205 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = PairingService.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C206 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C205;
+		};
+		A1B2C3D400020001A2B3C207 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = PhotoSyncService.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C208 = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C207;
+		};
+		A1B2C3D400020001A2B3C209 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SetupView.swift;
+			sourceTree = "<group>";
+		};
+		A1B2C3D400020001A2B3C20A = {
+			isa = PBXBuildFile;
+			fileRef = A1B2C3D400020001A2B3C209;
 		};
 		A1B2C3D400020001A2B3C202 = {
 			isa = PBXBuildFile;

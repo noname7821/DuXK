@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: duxk-web
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix web
+    startCommand: npm start --prefix web
+    disk:
+      name: duxk-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: STORAGE_DIR
+        value: /data
+      - key: NODE_VERSION
+        value: 20.18.0

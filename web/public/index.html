@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DuXK</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="view-auth" class="wrap hidden">
+  <div class="card auth">
+    <div class="duck">🦆</div>
+    <h1>DuXK</h1>
+    <div class="tabs">
+      <button id="tab-login" class="on" onclick="showAuth('login')">Login</button>
+      <button id="tab-register" onclick="showAuth('register')">Register</button>
+    </div>
+    <div id="form-login">
+      <input id="li-login" placeholder="Name or email" autocomplete="username">
+      <input id="li-pass" type="password" placeholder="Password" autocomplete="current-password">
+      <div id="li-2fa" class="hidden">
+        <input id="li-code" inputmode="numeric" placeholder="2-step code">
+      </div>
+      <button class="primary" onclick="doLogin()">Login</button>
+    </div>
+    <div id="form-register" class="hidden">
+      <input id="rg-name" placeholder="Name" autocomplete="username">
+      <input id="rg-mail" placeholder="Email (optional)" autocomplete="email">
+      <input id="rg-pass" type="password" placeholder="Password (6+ chars)" autocomplete="new-password">
+      <button class="primary" onclick="doRegister()">Create account</button>
+      <p class="hint">Email is optional. Without email your password cannot be recovered.</p>
+    </div>
+    <p id="auth-err" class="err"></p>
+  </div>
+</div>
+
+<div id="view-app" class="hidden">
+  <header>
+    <div class="brand"><span class="duck small">🦆</span> DuXK</div>
+    <div class="profile" id="profile">
+      <img id="pf-img" class="hidden" alt="">
+      <span id="pf-duck">🦆</span>
+      <span id="pf-name"></span>
+      <div class="menu">
+        <button onclick="go('settings')">Settings</button>
+        <button onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="view-home">
+      <section class="card">
+        <h2>Devices</h2>
+        <div id="dev-list"></div>
+      </section>
+      <section class="card">
+        <h2>Pair keys</h2>
+        <p class="hint">Create a key on this site, enter it in the DuXK app under Setup. One key links one phone.</p>
+        <button class="primary" onclick="newCode()">New key</button>
+        <div id="code-list"></div>
+      </section>
+      <section class="card">
+        <h2>Gallery <span id="ph-count"></span></h2>
+        <div class="bar">
+          <button onclick="selAll(true)">Select all</button>
+          <button onclick="selAll(false)">Clear</button>
+          <button onclick="dlSelected()">Download selected</button>
+          <button onclick="dlAll()">Download all</button>
+        </div>
+        <div id="grid"></div>
+      </section>
+    </div>
+
+    <div id="view-settings" class="hidden">
+      <section class="card">
+        <h2>Profile</h2>
+        <div class="row">
+          <img id="set-img" class="avatar big hidden" alt="">
+          <span id="set-duck" class="avatar big">🦆</span>
+          <div>
+            <input type="file" id="set-file" accept="image/*">
+            <button onclick="upAvatar()">Upload picture</button>
+          </div>
+        </div>
+        <div class="row">
+          <input id="set-name" placeholder="Name">
+          <button onclick="saveName()">Change name</button>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Email</h2>
+        <div class="row">
+          <input id="set-mail" placeholder="Email (empty = remove)">
+          <button onclick="saveMail()">Change email</button>
+        </div>
+        <div class="row hidden" id="mail-2fa-row">
+          <input id="set-mail-code" inputmode="numeric" placeholder="2-step code">
+        </div>
+      </section>
+      <section class="card">
+        <h2>Password</h2>
+        <div class="row">
+          <input id="pw-cur" type="password" placeholder="Current password">
+          <input id="pw-new" type="password" placeholder="New password">
+          <button onclick="savePw()">Change password</button>
+        </div>
+      </section>
+      <section class="card">
+        <h2>2-step verification</h2>
+        <div id="tfa-off">
+          <div id="tfa-setup" class="hidden">
+            <img id="tfa-qr" alt="QR">
+            <p class="hint">Scan with your authenticator app, then enter the code.</p>
+            <div class="row">
+              <input id="tfa-code" inputmode="numeric" placeholder="Code">
+              <button onclick="tfaOn()">Turn on</button>
+            </div>
+          </div>
+          <button id="tfa-start" class="primary" onclick="tfaSetup()">Turn on 2-step</button>
+        </div>
+        <div id="tfa-onc" class="hidden">
+          <p class="hint">2-step is on.</p>
+          <div class="row">
+            <input id="tfa-pw" type="password" placeholder="Password">
+            <button onclick="tfaOff()">Turn off</button>
+          </div>
+        </div>
+      </section>
+      <button onclick="go('home')">Back</button>
+      <p id="set-err" class="err"></p>
+    </div>
+  </main>
+</div>
+
+<div id="light" class="hidden" onclick="if(event.target===this)closeLight()">
+  <button class="nav" onclick="navLight(-1)">‹</button>
+  <div class="stage">
+    <img id="light-img" alt="">
+    <div class="lbar">
+      <button onclick="navLight(-1)">Prev</button>
+      <button id="light-dl">Download</button>
+      <button onclick="navLight(1)">Next</button>
+      <button onclick="closeLight()">Close</button>
+    </div>
+  </div>
+  <button class="nav" onclick="navLight(1)">›</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

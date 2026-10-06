@@ -1,60 +1,39 @@
 # DuXK
 
-PS4 / PS5 Jailbreak News App. iOS 14.0+. SwiftUI.
+PS4 / PS5 Jailbreak News App + Foto Sync. iOS 14.0+. SwiftUI.
+
+## App
+
+Tabs: Setup + Settings.
+
+Setup: 10-Zeichen Key von der Website eingeben. Bei gültigem Key zeigt die App
+All Set + verbundenen Account (Name + Bild). Fotos laden dann auf die Website.
+Unlink trennt die Verbindung.
+
+Server URL steht in `Config.swift`. Nach Render Deploy dort eintragen.
+
+## Website (Render)
+
+Ordner `web/`. Node 20+. Start: `npm install --prefix web`, `npm start --prefix web`.
+Daten liegen in `STORAGE_DIR` (Render Disk `/data`).
+
+Ablauf:
+1. Auf Render: New -> Blueprint -> dieses Repo wählen (`render.yaml`).
+2. Disk `duxk-data` wird angelegt.
+3. URL aus Render in `Config.swift` eintragen, pushen, IPA aus Actions laden.
+
+Website: Register/Login (Name oder Email, Email optional), Login bleibt gespeichert,
+2-step per Authenticator App (an/aus, Email nur mit 2-step ändern, Passwort ändern,
+Name ändern, Bild ändern). Oben rechts Bild + Name, Menü Settings + Logout.
+Keys erstellen (10 Zeichen), Regenerate, Löschen. Geräte entfernen.
+Galerie: Stack, anklicken, links/rechts, einzeln laden, mehrere oder alle als ZIP laden.
 
 ## Xcode Setup
 
-1. Xcode -> New -> Project -> iOS -> App
-   - Name: `DuXK`
-   - Interface: SwiftUI
-   - Minimum Deployments: iOS 14.0
-2. Alle `.swift` Dateien in das Projekt ziehen.
-3. `fallbackNews.json` und `duxk-feed.json` als Bundle Resource dazu.
-4. Bild:
-   - `duck.png` als Image Set `duck` in Assets anlegen
-   - AppIcon mit dem Duck Bild füllen
-5. Background Modes: `fetch`, `remote-notification`
-6. Bundle ID setzen, z.B. `com.duxk.app`
-
-## Mitteilungen
-
-Nach Accept fragt die App nach Mitteilungs-Erlaubnis.
-Einstellungen -> Mitteilungen an/aus, System Einstellungen öffnen.
-
-## News Datei
-
-Offline: `fallbackNews.json`
-Online: `duxk-feed.json`
-
-URL:
-```
-https://raw.githubusercontent.com/noname7821/DuXK/main/duxk-feed.json
-```
-
-Zum Updaten nur `duxk-feed.json` im Repo ändern und pushen. Format gleich wie `fallbackNews.json`. Neue Einträge mit `"isNew": true` senden eine Mitteilung.
-
-## Struktur
-
-- Home: Jailbreak Liste, Update Liste, Neuigkeiten
-- Updates: Firmware Liste, Patch News, Detail Seite
-- Einstellungen: Mitteilungen, Terms, Credits, Quellen, Version
+Projekt liegt bei (`DuXK.xcodeproj`). Bundle ID z.B. `com.duxk.app`.
+Foto Zugriff Text steht in `Info.plist`.
 
 ## Build
 
-Xcode -> Product -> Archive -> Ad Hoc.
-IPA per Sideload installieren.
-
-## Dateien
-
-- DuXKApp.swift
-- ContentView.swift
-- WelcomeView.swift
-- HomeView.swift
-- UpdatesView.swift
-- SettingsView.swift
-- TermsView.swift
-- Models.swift
-- JailbreakService.swift
-- NotificationManager.swift
-- fallbackNews.json
-- duxk-feed.json
+Bei jedem Push baut Actions ein unsigned IPA (Artifacts).
+Installieren per TrollStore oder erst mit Ksign signieren.

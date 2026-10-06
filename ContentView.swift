@@ -38,16 +38,10 @@ struct MainTabs: View {
 
     var body: some View {
         TabView {
-            HomeView()
+            SetupView()
                 .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
-
-            UpdatesView()
-                .tabItem {
-                    Image(systemName: "arrow.down.circle.fill")
-                    Text("Updates")
+                    Image(systemName: "link")
+                    Text("Setup")
                 }
 
             SettingsView()
